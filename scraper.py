@@ -7,7 +7,7 @@ def fetch_tech_headlines():
     # Load API key from GitHub Secrets
     api_key = os.getenv("NEWS_API_KEY")
     # Endpoint for 10 US technology headlines
-    url = f"https://newsapi.org{api_key}"
+    url = f"https://newsapi.org/apiKey={api_key}"
     
     response = requests.get(url)
     data = response.json()
