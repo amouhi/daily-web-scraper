@@ -1,0 +1,35 @@
+name: Daily Tech News Scraper
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 3:00 AM UTC daily
+  workflow_dispatch: # Allows manual testing from the Actions tab
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Scraper
+        env:
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        run: python scraper.py
+
+      - name: Commit and Push CSV
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add *.csv
+          git commit -m "Add daily tech headlines for $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push
+          
