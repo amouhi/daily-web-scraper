@@ -1,7 +1,31 @@
 import requests
 import csv
 import os
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
+
+def cleanup_old_files(folder_path, days_to_keep=30):
+    """Deletes files in the specified folder older than days_to_keep."""
+    if not os.path.exists(folder_path):
+        return
+    
+    # Calculate the cutoff time in seconds
+    now = time.time()
+    cutoff = now - (days_to_keep * 86400)
+    
+    deleted_count = 0
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        
+        # Check if it's a file and if its last modified time is older than the cutoff
+        if os.path.isfile(file_path):
+            if os.path.getmtime(file_path) < cutoff:
+                os.remove(file_path)
+                print(f"Deleted old file: {filename}")
+                deleted_count += 1
+    
+    if deleted_count > 0:
+        print(f"Cleanup finished. Removed {deleted_count} files older than {days_to_keep} days.")
 
 def fetch_tech_headlines():
     api_key = os.getenv("NEWS_API_KEY")
@@ -9,45 +33,27 @@ def fetch_tech_headlines():
         print("ERROR: NEWS_API_KEY is missing.")
         return
 
-    # Generate dates
-    now = datetime.now()
-    today_date = now.strftime("%Y-%m-%d")
-    file_date = now.strftime("%Y%m%d")
-    
-    # Ensure folder exists
-    os.makedirs("files", exist_ok=True)
+    file_date = datetime.now().strftime("%Y%m%d")
+    folder_name = "files"
+    os.makedirs(folder_name, exist_ok=True)
 
-    # 1. ADD HEADERS: This is the missing piece that makes the script act like a browser
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
     }
 
-    # 2. URL (Same as yours, but with pageSize=20 to ensure we get a good batch)
-    url = f"https://newsapi.org/v2/everything?q=azure&sortBy=publishedAt&pageSize=20&apiKey={api_key}"
+    # API query for Azure
+    url = f"https://newsapi.org{api_key}"
     
     try:
-        # 3. Pass the headers into the request
         response = requests.get(url, headers=headers)
-        
-        if response.status_code != 200:
-            print(f"API Error {response.status_code}: {response.text}")
-            return
-
         data = response.json()
         articles = data.get("articles", [])
         
-        # Log counts for debugging
-        total_found = data.get('totalResults', 0)
-        print(f"API reported total results: {total_found}")
-        print(f"Articles received in this request: {len(articles)}")
+        filename = os.path.join(folder_name, f"scrapping_results_{file_date}.csv")
 
-        filename = f"files/scrapping_results_{file_date}.csv"
-
-        # 4. Write to CSV
         with open(filename, mode='w', newline='', encoding='utf-8-sig') as file:
             writer = csv.writer(file)
             writer.writerow(["Source", "Headline", "URL", "Published At"])
-            
             for article in articles:
                 writer.writerow([
                     article.get('source', {}).get('name', 'Unknown'),
@@ -58,8 +64,12 @@ def fetch_tech_headlines():
         
         print(f"SUCCESS: Saved {len(articles)} articles to {filename}")
         
+        # --- NEW: Run cleanup after saving the new file ---
+        cleanup_old_files(folder_name, days_to_keep=30)
+        
     except Exception as e:
         print(f"CRITICAL ERROR: {e}")
 
 if __name__ == "__main__":
     fetch_tech_headlines()
+        
