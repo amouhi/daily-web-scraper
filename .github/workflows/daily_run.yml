@@ -30,6 +30,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add .  # Automatically includes the 'files' folder and the CSV
+          git add -A # Automatically includes the 'files' folder and the CSV and the deletes
           git commit -m "Add daily Azure headlines" || echo "No changes"
           git push
