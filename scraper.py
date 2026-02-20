@@ -42,7 +42,7 @@ def fetch_tech_headlines():
     }
 
     # API query for Azure
-    url = f"https://newsapi.org{api_key}"
+    url = f"https://newsapi.org/v2/everything?q=azure&sortBy=publishedAt&pageSize=20&apiKey={api_key}"
     
     try:
         response = requests.get(url, headers=headers)
