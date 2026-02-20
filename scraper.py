@@ -65,7 +65,7 @@ def fetch_tech_headlines():
         print(f"SUCCESS: Saved {len(articles)} articles to {filename}")
         
         # --- NEW: Run cleanup after saving the new file ---
-        cleanup_old_files(folder_name, days_to_keep=30)
+        cleanup_old_files(folder_name, days_to_keep=3)
         
     except Exception as e:
         print(f"CRITICAL ERROR: {e}")
