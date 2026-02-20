@@ -23,7 +23,7 @@ def fetch_tech_headlines():
     }
 
     # 2. URL (Same as yours, but with pageSize=20 to ensure we get a good batch)
-    url = f"https://newsapi.org/v2/everything?q=azure&from={today_date}&sortBy=publishedAt&pageSize=20&apiKey={api_key}"
+    url = f"https://newsapi.org/v2/everything?q=azure&sortBy=publishedAt&pageSize=20&apiKey={api_key}"
     
     try:
         # 3. Pass the headers into the request
