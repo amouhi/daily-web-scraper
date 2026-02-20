@@ -12,7 +12,7 @@ def fetch_tech_headlines():
         return
 
     # 2. Construct the URL carefully (verify the slash after .org)
-    url = f"https://newsapi.org/apiKey={api_key}"
+    url = f"https://newsapi.org/v2/everything?q=azure&from=2026-01-19&sortBy=publishedAt&apiKey={api_key}"
     
     response = requests.get(url)
 
