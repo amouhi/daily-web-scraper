@@ -6,13 +6,15 @@ from datetime import datetime
 def fetch_tech_headlines():
     api_key = os.getenv("NEWS_API_KEY")
     
+    # get today's date
+    today_date = datetime.now().strftime("%Y-%m-%d")
     # 1. Check if the secret is actually being loaded
     if not api_key:
         print("ERROR: NEWS_API_KEY environment variable is empty. Check your GitHub Secrets.")
         return
 
     # 2. Construct the URL carefully (verify the slash after .org)
-    url = f"https://newsapi.org/v2/everything?q=azure&from=2026-01-19&sortBy=publishedAt&apiKey={api_key}"
+    url = f"https://newsapi.org/v2/everything?q=azure&from={today_date}&sortBy=publishedAt&apiKey={api_key}"
     
     response = requests.get(url)
 
